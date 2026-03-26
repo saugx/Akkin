@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abarrotes Ak Kin</title>
+
+<style>
+*{box-sizing:border-box;}
+body{
+margin:0;
+font-family:'Segoe UI',sans-serif;
+background:#f0f2f5;
+}
+
+/* HEADER */
+header{
+background:linear-gradient(90deg,#ff7a00,#ffb347);
+color:white;
+padding:15px;
+text-align:center;
+font-size:22px;
+font-weight:bold;
+position:relative;
+}
+
+/* BOTÓN ADMIN */
+.admin-btn{
+position:absolute;
+top:10px;
+right:10px;
+opacity:0;
+}
+
+/* BANNER */
+.banner{
+position:relative;
+height:180px;
+}
+.banner img{
+width:100%;
+height:100%;
+object-fit:cover;
+filter:brightness(0.6);
+}
+.banner-texto{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+color:white;
+text-align:center;
+}
+
+/* PRODUCTOS */
+.grid{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:12px;
+padding:12px;
+}
+
+.producto{
+background:white;
+border-radius:15px;
+padding:10px;
+box-shadow:0 4px 12px rgba(0,0,0,0.1);
+transition:0.2s;
+}
+.producto:hover{transform:scale(1.03);}
+
+.producto img{
+width:100%;
+aspect-ratio:1/1;
+object-fit:contain;
+background:#fafafa;
+border-radius:10px;
+}
+
+.producto h4{margin:8px 0 5px;}
+.producto p{color:#e53935;font-weight:bold;}
+
+.btn-agregar{
+width:100%;
+background:#00c853;
+color:white;
+padding:10px;
+border:none;
+border-radius:20px;
+margin-top:5px;
+}
+
+/* RECOMENDADOS */
+.scroll{
+display:flex;
+overflow-x:auto;
+gap:10px;
+padding:10px;
+}
+.card-mini{
+min-width:120px;
+background:white;
+border-radius:12px;
+padding:8px;
+box-shadow:0 2px 8px rgba(0,0,0,0.1);
+text-align:center;
+}
+.card-mini img{
+width:100%;
+height:80px;
+object-fit:contain;
+}
+
+/* CARRITO */
+.btn-carrito{
+position:fixed;
+bottom:80px;
+right:20px;
+background:#ff7a00;
+color:white;
+padding:15px;
+border-radius:50%;
+font-size:20px;
+}
+
+#contadorCarrito{
+position:absolute;
+top:-5px;
+right:-5px;
+font-size:14px;
+background:red;
+padding:3px 7px;
+border-radius:50%;
+}
+
+.carrito{
+position:fixed;
+bottom:-100%;
+left:0;
+width:100%;
+background:white;
+padding:20px;
+border-radius:20px 20px 0 0;
+transition:0.3s;
+max-height:70%;
+overflow:auto;
+}
+.carrito.activo{bottom:0;}
+
+/* WHATSAPP */
+.btn-wsp{
+position:fixed;
+bottom:20px;
+right:20px;
+background:#25D366;
+color:white;
+padding:15px;
+border-radius:50%;
+font-size:22px;
+}
+
+/* DETALLE */
+.detalle{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:white;
+display:none;
+padding:20px;
+overflow:auto;
+}
+.detalle img{
+width:100%;
+max-height:250px;
+object-fit:contain;
+}
+
+/* SUGERENCIAS */
+textarea{
+width:100%;
+padding:10px;
+border-radius:10px;
+border:1px solid #ccc;
+}
+
+button{cursor:pointer;}
+</style>
+</head>
+
+<body>
+
+<header>
+🛒 Abarrotes Ak Kin
+<button class="admin-btn" onclick="abrirAdmin()">.</button>
+</header>
+
+<!-- BANNER -->
+<div class="banner">
+<img src="https://via.placeholder.com/800x200">
+<div class="banner-texto">
+<h1>Abarrotes Ak Kin</h1>
+<p>Las mejores ofertas 🔥</p>
+</div>
+</div>
+
+<!-- PRODUCTOS -->
+<div class="grid" id="productos"></div>
+
+<h3 style="padding:10px;">🔥 Recomendados</h3>
+<div class="scroll" id="recomendados"></div>
+
+<!-- BOTÓN CARRITO -->
+<div class="btn-carrito" onclick="toggleCarrito()">
+🛒 <span id="contadorCarrito">0</span>
+</div>
+
+<!-- WHATSAPP -->
+<div class="btn-wsp" onclick="enviarWhats()">💬</div>
+
+<!-- CARRITO -->
+<div class="carrito" id="carritoPanel">
+<button onclick="cerrarCarrito()">❌</button>
+<ul id="lista"></ul>
+<h3 id="total"></h3>
+<button onclick="enviarWhats()" style="width:100%;padding:12px;background:#25D366;color:white;border:none;border-radius:10px;">
+Pedir por WhatsApp
+</button>
+</div>
+
+<!-- DETALLE -->
+<div class="detalle" id="detalle">
+<button onclick="cerrarDetalle()">⬅ Volver</button>
+<img id="detalleImg">
+<h2 id="detalleNombre"></h2>
+<p id="detallePrecio"></p>
+<p id="detalleDesc"></p>
+<button class="btn-agregar" onclick="agregarDesdeDetalle()">Agregar</button>
+
+<h3>🔥 También te puede interesar</h3>
+<div class="scroll" id="recomendadosDetalle"></div>
+</div>
+
+<!-- SUGERENCIAS -->
+<div style="padding:15px;">
+<h2>💡 Sugerencias</h2>
+<textarea id="sugerencia"></textarea>
+<button onclick="enviarSugerencia()" style="width:100%;padding:12px;background:#ff7a00;color:white;border:none;border-radius:10px;margin-top:10px;">
+Enviar
+</button>
+</div>
+
+<!-- ADMIN -->
+<div id="panelAdmin" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:white;padding:20px;">
+<button onclick="cerrarAdmin()">Cerrar</button>
+<h2>🔒 Sugerencias</h2>
+<div id="listaSugerencias"></div>
+</div>
+
+<script>
+let productos=[
+{nombre:"Coca Cola",precio:18,img:"https://d1zc67o3u1epb0.cloudfront.net/media/catalog/product/5/6/560.jpg",desc:"Refresco",categoria:"bebidas"},
+{nombre:"Pepsi",precio:17,img:"https://bbfamily.com.mx/wp-content/uploads/2023/08/botella-pepsi.jpg",desc:"Refresco",categoria:"bebidas"},
+{nombre:"Sabritas",precio:15,img:"https://convy.mx/cdn/shop/files/Sabritasoriginales160g_900x.jpg",desc:"Botana",categoria:"botanas"}
+];
+
+let carrito={};
+let productoActual=null;
+
+/* PRODUCTOS */
+function mostrarProductos(){
+productos.forEach(p=>{
+productosDiv.innerHTML+=`
+<div class="producto" onclick="verDetalle('${p.nombre}')">
+<img src="${p.img}">
+<h4>${p.nombre}</h4>
+<p>$${p.precio}</p>
+<button class="btn-agregar" onclick="event.stopPropagation();agregar('${p.nombre}',${p.precio})">
+Agregar
+</button>
+</div>`;
+});
+}
+
+/* RECOMENDADOS */
+function mostrarRecomendados(){
+productos.forEach(p=>{
+recomendados.innerHTML+=`
+<div class="card-mini" onclick="verDetalle('${p.nombre}')">
+<img src="${p.img}">
+<p>${p.nombre}</p>
+</div>`;
+});
+}
+
+/* DETALLE */
+function verDetalle(n){
+let p=productos.find(x=>x.nombre===n);
+productoActual=p;
+
+detalle.style.display="block";
+detalleImg.src=p.img;
+detalleNombre.innerText=p.nombre;
+detallePrecio.innerText="$"+p.precio;
+detalleDesc.innerText=p.desc;
+
+mostrarRecomendadosDetalle(n);
+}
+
+function cerrarDetalle(){detalle.style.display="none";}
+
+/* RECOMENDADOS DETALLE */
+function mostrarRecomendadosDetalle(n){
+recomendadosDetalle.innerHTML="";
+let actual=productos.find(p=>p.nombre===n);
+
+productos.filter(p=>p.categoria===actual.categoria && p.nombre!==n)
+.forEach(p=>{
+recomendadosDetalle.innerHTML+=`
+<div class="card-mini" onclick="verDetalle('${p.nombre}')">
+<img src="${p.img}">
+<p>${p.nombre}</p>
+</div>`;
+});
+}
+
+/* CARRITO */
+function agregar(n,p){
+if(carrito[n])carrito[n].cantidad++;
+else carrito[n]={precio:p,cantidad:1};
+renderCarrito();
+}
+
+function sumar(n,p){
+if(carrito[n])carrito[n].cantidad++;
+renderCarrito();
+}
+
+function restar(n){
+if(!carrito[n])return;
+carrito[n].cantidad--;
+if(carrito[n].cantidad<=0) delete carrito[n];
+renderCarrito();
+}
+
+function renderCarrito(){
+let total=0;
+let totalItems=0;
+lista.innerHTML="";
+
+for(let n in carrito){
+let item=carrito[n];
+let sub=item.precio*item.cantidad;
+total+=sub;
+totalItems+=item.cantidad;
+
+lista.innerHTML+=`
+<li>
+${n} x${item.cantidad} - $${sub}
+<button onclick="sumar('${n}',${item.precio})">➕</button>
+<button onclick="restar('${n}')">➖</button>
+</li>`;
+}
+
+totalText.innerText="Total: $"+total;
+contadorCarrito.innerText=totalItems;
+}
+
+function toggleCarrito(){carritoPanel.classList.add("activo");}
+function cerrarCarrito(){carritoPanel.classList.remove("activo");}
+
+function agregarDesdeDetalle(){
+agregar(productoActual.nombre,productoActual.precio);
+}
+
+/* WHATSAPP */
+function enviarWhats(){
+let msg="Hola, quiero pedir:\n";
+let total=0;
+
+for(let n in carrito){
+let item=carrito[n];
+let sub=item.precio*item.cantidad;
+total+=sub;
+msg+=`- ${n} x${item.cantidad} ($${sub})\n`;
+}
+
+msg+=`Total: $${total}`;
+window.open(`https://wa.me/5215611989913?text=${encodeURIComponent(msg)}`);
+}
+
+/* SUGERENCIAS */
+let sugerencias=JSON.parse(localStorage.getItem("sugerencias"))||[];
+
+function enviarSugerencia(){
+if(!sugerencia.value)return;
+sugerencias.push(sugerencia.value);
+localStorage.setItem("sugerencias",JSON.stringify(sugerencias));
+sugerencia.value="";
+alert("Gracias por tu opinión ❤️");
+}
+
+/* ADMIN */
+function abrirAdmin(){
+let clave=prompt("Contraseña:");
+if(clave==="1234"){
+panelAdmin.style.display="block";
+mostrarSugerencias();
+}
+}
+function cerrarAdmin(){panelAdmin.style.display="none";}
+function mostrarSugerencias(){
+listaSugerencias.innerHTML="";
+sugerencias.forEach(s=>{
+listaSugerencias.innerHTML+=`<div>${s}</div>`;
+});
+}
+
+/* INIT */
+let productosDiv=document.getElementById("productos");
+let totalText=document.getElementById("total");
+
+mostrarProductos();
+mostrarRecomendados();
+</script>
+
+</body>
+</html>
