@@ -52,6 +52,26 @@ color:white;
 text-align:center;
 }
 
+/* BOTONES DE CATEGORÍA */
+.filtros{
+padding:10px;
+text-align:center;
+}
+.filtros button{
+margin:0 5px 5px 5px;
+padding:8px 15px;
+border:none;
+border-radius:10px;
+background:#ff7a00;
+color:white;
+font-weight:bold;
+cursor:pointer;
+transition:0.2s;
+}
+.filtros button:hover{
+background:#ffb347;
+}
+
 /* PRODUCTOS */
 .grid{
 display:grid;
@@ -205,6 +225,14 @@ button{cursor:pointer;}
 </div>
 </div>
 
+<!-- BOTONES DE FILTRO -->
+<div class="filtros">
+<button onclick="filtrarProductos('todos')">Todos</button>
+<button onclick="filtrarProductos('bebidas')">🥤 Refrescos</button>
+<button onclick="filtrarProductos('botanas')">🍿 Botanas</button>
+<button onclick="filtrarProductos('dulces')">🍬 Dulces</button>
+</div>
+
 <!-- PRODUCTOS -->
 <div class="grid" id="productos"></div>
 
@@ -249,6 +277,7 @@ Pedir por WhatsApp
 <button onclick="enviarSugerencia()" style="width:100%;padding:12px;background:#ff7a00;color:white;border:none;border-radius:10px;margin-top:10px;">
 Enviar
 </button>
+<!-- Eliminamos la lista de sugerencias de la página principal -->
 </div>
 
 <!-- ADMIN -->
@@ -262,25 +291,32 @@ Enviar
 let productos=[
 {nombre:"Coca Cola",precio:18,img:"https://d1zc67o3u1epb0.cloudfront.net/media/catalog/product/5/6/560.jpg",desc:"Refresco",categoria:"bebidas"},
 {nombre:"Pepsi",precio:17,img:"https://bbfamily.com.mx/wp-content/uploads/2023/08/botella-pepsi.jpg",desc:"Refresco",categoria:"bebidas"},
-{nombre:"Sabritas",precio:15,img:"https://convy.mx/cdn/shop/files/Sabritasoriginales160g_900x.jpg",desc:"Botana",categoria:"botanas"}
+{nombre:"Sabritas",precio:15,img:"https://convy.mx/cdn/shop/files/Sabritasoriginales160g_900x.jpg",desc:"Botana",categoria:"botanas"},
+{nombre:"Chicles Trident", precio:5, img:"https://resources.sanborns.com.mx/imagenes-sanborns-ii/1200/7506105606077_2.jpg?scale=500&qlty=75", desc:"Chicles sabor menta", categoria:"dulces"},
+{nombre:"Chocolate Jet", precio:12, img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRP-vh4vO3hARmPsOodUHEmoQPA9Bmb8FiDZmt2h_nNsEtNuglvATnOnh0&s=10", desc:"Chocolate con leche", categoria:"dulces"}
 ];
 
 let carrito={};
 let productoActual=null;
 
-/* PRODUCTOS */
-function mostrarProductos(){
-productos.forEach(p=>{
-productosDiv.innerHTML+=`
-<div class="producto" onclick="verDetalle('${p.nombre}')">
-<img src="${p.img}">
-<h4>${p.nombre}</h4>
-<p>$${p.precio}</p>
-<button class="btn-agregar" onclick="event.stopPropagation();agregar('${p.nombre}',${p.precio})">
-Agregar
-</button>
-</div>`;
-});
+/* FILTRAR PRODUCTOS POR CATEGORÍA */
+function filtrarProductos(categoria){
+  let contenedor = document.getElementById("productos");
+  contenedor.innerHTML = "";
+
+  productos.forEach(p=>{
+    if(categoria === "todos" || p.categoria === categoria){
+      contenedor.innerHTML += `
+        <div class="producto" onclick="verDetalle('${p.nombre}')">
+          <img src="${p.img}">
+          <h4>${p.nombre}</h4>
+          <p>$${p.precio}</p>
+          <button class="btn-agregar" onclick="event.stopPropagation();agregar('${p.nombre}',${p.precio})">
+            Agregar
+          </button>
+        </div>`;
+    }
+  });
 }
 
 /* RECOMENDADOS */
@@ -391,14 +427,14 @@ window.open(`https://wa.me/5215611989913?text=${encodeURIComponent(msg)}`);
 }
 
 /* SUGERENCIAS */
-let sugerencias=JSON.parse(localStorage.getItem("sugerencias"))||[];
+let sugerencias = JSON.parse(localStorage.getItem("sugerencias")) || [];
 
 function enviarSugerencia(){
-if(!sugerencia.value)return;
-sugerencias.push(sugerencia.value);
-localStorage.setItem("sugerencias",JSON.stringify(sugerencias));
-sugerencia.value="";
-alert("Gracias por tu opinión ❤️");
+    if(!sugerencia.value) return;
+    sugerencias.push(sugerencia.value);
+    localStorage.setItem("sugerencias", JSON.stringify(sugerencias));
+    sugerencia.value = "";
+    alert("Gracias por tu opinión ❤️");
 }
 
 /* ADMIN */
@@ -406,11 +442,11 @@ function abrirAdmin(){
 let clave=prompt("Contraseña:");
 if(clave==="1234"){
 panelAdmin.style.display="block";
-mostrarSugerencias();
+mostrarSugerenciasAdmin();
 }
 }
 function cerrarAdmin(){panelAdmin.style.display="none";}
-function mostrarSugerencias(){
+function mostrarSugerenciasAdmin(){
 listaSugerencias.innerHTML="";
 sugerencias.forEach(s=>{
 listaSugerencias.innerHTML+=`<div>${s}</div>`;
@@ -418,10 +454,9 @@ listaSugerencias.innerHTML+=`<div>${s}</div>`;
 }
 
 /* INIT */
-let productosDiv=document.getElementById("productos");
 let totalText=document.getElementById("total");
 
-mostrarProductos();
+filtrarProductos('todos'); // mostrar todos al inicio
 mostrarRecomendados();
 </script>
 
